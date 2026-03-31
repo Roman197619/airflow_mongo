@@ -1,0 +1,93 @@
+# Byte-compiled / optimized files
+__pycache__/
+*.py[cod]
+*$py.class
+
+# C extensions
+*.so
+
+# Distribution / packaging
+build/
+dist/
+*.egg-info/
+.eggs/
+eggs/
+wheels/
+
+# Installer logs
+pip-log.txt
+pip-delete-this-directory.txt
+
+# Unit test / coverage
+.pytest_cache/
+.cache/
+.tox/
+.nox/
+.coverage
+.coverage.*
+coverage.xml
+nosetests.xml
+*.cover
+htmlcov/
+.hypothesis/
+
+# Jupyter
+.ipynb_checkpoints
+
+# Virtualenv / envs
+venv/
+ENV/
+env/
+.venv/
+env.bak/
+venv.bak/
+
+# Pyenv
+.python-version
+
+# Pipenv
+Pipfile.lock
+
+# IDEs and editors
+.vscode/
+.idea/
+*.sublime-project
+*.sublime-workspace
+
+# PyCharm
+.pydevproject
+
+# mypy
+.mypy_cache/
+
+# Local env / secret files
+.env
+.env.*
+secrets/
+*.key
+*.pem
+
+# Airflow specific
+airflow.cfg
+airflow.db
+*.db
+logs/
+/logs/
+*.log
+airflow-*.log
+airflow-scheduler.pid
+.airflowignore
+
+# Docker override files (commonly local)
+docker-compose.override.yml
+docker-compose.override.yaml
+
+# macOS
+.DS_Store
+
+# Windows
+Thumbs.db
+ehthumbs.db
+
+# Misc
+*.sqlite

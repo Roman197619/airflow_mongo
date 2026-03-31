@@ -1,0 +1,58 @@
+Проект Airflow — локальная инструкция
+===================================
+
+Кратко: этот compose содержит сервисы Airflow (web/scheduler), PostgreSQL (metadata) и MongoDB (хранилище результатов).
+
+Требования
+- Docker & Docker Compose
+- Git (опционально)
+
+Переменные окружения
+- Файл .env (опционально) поддерживается — проект читает `FOLDER_PATH` и `FILENAME`.
+  Пример `.env`:
+  FOLDER_PATH=/opt/airflow/data
+  FILENAME=tiktok_google_play_reviews.csv
+  AIRFLOW_UID=50000
+
+Запуск локально
+1. Перейдите в папку `airflow`:
+   ```bash
+   cd airflow
+   ```
+2. Построить и поднять сервисы:
+   ```bash
+   docker compose up --build
+   ```
+3. Airflow UI будет доступен на `http://localhost:8080`.
+
+Где класть CSV
+- Положите ваш `tiktok_google_play_reviews.csv` в папку `airflow/data/` (локально) или в путь, указанный в `FOLDER_PATH`.
+
+Основные DAG'ы и поведение
+- `file_sensor_dag` — ожидает появления файла, затем ветвится:
+  - если файл пуст — выполняется `log_empty_file` (echo в bash);
+  - если файл содержит данные — запускается `data_processing` TaskGroup с задачами:
+    1) `fill_nulls` — заменяет пустые/NA на "-";
+    2) `sort_data` — сортирует по колонке даты (ищет `at`, `created_at`, `created_date`, `createdDate`);
+    3) `clean_content` — удаляет лишние символы из поля `content` и отмечает датасет (outlet `Asset`).
+
+- `load_tiktok_reviews_to_mongodb` — DAG, настроенный на `schedule=[file_asset]` (dataset-aware). Он загружает обработанный CSV в MongoDB (коллекция `tiktok_reviews` в базе `tiktok_db`).
+
+скриншот дага ![alt text](image.png)
+
+
+MongoDB / Airflow connection
+- В `docker-compose.yaml` задаётся переменная окружения `AIRFLOW_CONN_MONGO_DEFAULT=mongo://mongodb:27017/tiktok_db`. Airflow использует `mongo_default` hook.
+- MongoDB доступна на `localhost:27017` (если вы не используете devcontainer). Данные сохраняются в volume `mongodb_data`.
+
+Полный список MongoDB-запросов см. файл: [mongo_queries.js](mongo_queries.js)
+
+Проверка и отладка
+- Логи Airflow: через UI -> DAG -> Task -> Logs.
+- В контейнере MongoDB можно проверить коллекции:
+  ```bash
+  docker exec -it mongodb mongosh
+  use tiktok_db
+  db.tiktok_reviews.count()
+  ```
+
